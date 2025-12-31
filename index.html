@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokédex</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body onload="init()">
+    <main class="main">
+      <header class="header-home">
+        <div class="container">
+          <div class="log-box">
+            <img src="./assets/pokeball.svg" alt="pokeball" />
+            <h1>Pokedex</h1>
+          </div>
+
+          <div class="search-wrapper">
+            <div class="search-box">
+              <img src="./assets/search.svg" alt="search icon" class="search-icon" />
+              <input
+                type="text"
+                class="search-input body-3-fonts"
+                placeholder="Search your Pokemon"
+                id="searchInput"
+                oninput="searchPokemonDebounced()"
+              />
+              <img
+                src="./assets/cross.svg"
+                alt="cross-icon"
+                class="search-close-icon"
+                id="search-close-icon"
+                onclick="clearSearch()"
+              />
+            </div>
+
+            <div class="sort-wrapper">
+              <div class="filter-section">
+                <p class="text-body">sort by:</p>
+                <div class="filter-section">
+                  <div>
+                    <input type="radio" id="number" name="filters" value="number" checked />
+                    <label for="number" class="body-3-fonts">Number</label>
+                  </div>
+                  <div>
+                    <input type="radio" id="name" name="filters" value="name" />
+                    <label for="name" class="body-3-fonts">Name</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </header>
+
+      <section class="pokemon-list">
+        <div class="container">
+          <div class="list-wrapper hidden" id="content"></div>
+
+          <div class="centerMoreButton">
+            <button id="loadMoreBtn" class="moreButton">Load more</button>
+          </div>
+
+          <div id="not-found-message" style="display:none">pokemon not found</div>
+        </div>
+      </section>
+    </main>
+
+    <dialog
+      class="dialog"
+      id="openDialog"
+      onmousedown="event.target==this && this.close(-1)"
+      onclose="this.returnValue==-1"
+    >
+      <div id="renderPokemonsDialog"></div>
+    </dialog>
+
+    <div id="loadingScreen">
+      <div class="pokeball-spinner"></div>
+    </div>
+
+    <script src="template.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
