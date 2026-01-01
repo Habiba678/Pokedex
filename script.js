@@ -3,9 +3,11 @@ let BASE_URL = "https://pokeapi.co/api/v2/pokemon"
 let SPECIES_URL = "https://pokeapi.co/api/v2/pokemon-species"
 let currentindex = 0
 let offset = 0
-const limit = 20
+const limit = 15
+const pokemon = 151
 let pokemonCache = {}
 let speciesCache = {}
+let searchTimeout
 
 const typeColors = {
   normal: "#A8A77A",
@@ -38,22 +40,24 @@ async function init() {
 }
 
 async function fetchDataJson() {
+  if (offset >= pokemon) return
   setLoading(true)
   const list = await fetchPokemonList(offset)
-
   let newPokemons = []
   for (let entry of list) {
-    const pokemon = await getPokemon(entry)
-    newPokemons.push(pokemon)
+    const p = await getPokemon(entry)
+    newPokemons.push(p)
   }
-
   allPokemons.push(...newPokemons)
   renderPokemons()
   setLoading(false)
 }
 
 async function fetchPokemonList(offset) {
-  const response = await fetch(`${BASE_URL}?limit=${limit}&offset=${offset}`)
+  const rest = pokemon - offset
+  const currentLimit = rest < limit ? rest : limit
+  if (currentLimit <= 0) return []
+  const response = await fetch(`${BASE_URL}?limit=${currentLimit}&offset=${offset}`)
   const data = await response.json()
   return data.results
 }
@@ -77,55 +81,55 @@ function renderPokemons() {
 
 async function OpenPokemon(index) {
   currentindex = index
-  let pokemon = allPokemons[index]
+  updateDialog()
+}
 
+async function updateDialog() {
+  let p = allPokemons[currentindex]
   let dialog = document.getElementById("openDialog")
   let content = document.getElementById("renderPokemonsDialog")
-
-  content.innerHTML = GetPokemonDialogTemplate(pokemon)
-  showMain(pokemon)
-
-  let description = await getEnglishFlavorText(pokemon.id)
+  content.innerHTML = GetPokemonDialogTemplate(p)
+  showMain(p)
+  let description = await getEnglishFlavorText(p.id)
   let descriptionElement = document.getElementById("pokemonDescription")
   if (descriptionElement) descriptionElement.textContent = description
-
-  dialog.showModal()
+  if (!dialog.open) dialog.showModal()
 }
 
 function closeDialog() {
   document.getElementById("openDialog").close()
 }
 
-function showMain(pokemon) {
-  document.getElementById("dialogContentmain").innerHTML = getMainSection(pokemon)
+function showMain(p) {
+  document.getElementById("dialogContentmain").innerHTML = getMainSection(p)
 }
 
-function showStats(pokemon) {
-  document.getElementById("dialogContentmain").innerHTML = renderAllStats(pokemon)
+function showStats(p) {
+  document.getElementById("dialogContentmain").innerHTML = renderAllStats(p)
 }
 
-function renderAllStats(pokemon) {
+function renderAllStats(p) {
   let html = ""
-  for (let i = 0; i < pokemon.stats.length; i++) {
-    html += getStatsSection(pokemon.stats[i].stat.name, pokemon.stats[i].base_stat)
+  for (let i = 0; i < p.stats.length; i++) {
+    html += getStatsSection(p.stats[i].stat.name, p.stats[i].base_stat)
   }
   return html
 }
 
-function showEvolution(pokemon) {
-  document.getElementById("dialogContentmain").innerHTML = getEvolutionSection(pokemon)
+function showEvolution(p) {
+  document.getElementById("dialogContentmain").innerHTML = getEvolutionSection(p)
 }
 
 function prevPage() {
   if (currentindex > 0) currentindex--
   else currentindex = allPokemons.length - 1
-  OpenPokemon(currentindex)
+  updateDialog()
 }
 
 function nextPage() {
   if (currentindex < allPokemons.length - 1) currentindex++
   else currentindex = 0
-  OpenPokemon(currentindex)
+  updateDialog()
 }
 
 function setLoading(isLoading) {
@@ -137,7 +141,7 @@ async function getEnglishFlavorText(id) {
   try {
     const response = await fetch(`${SPECIES_URL}/${id}`)
     const data = await response.json()
-    const entry = (data.flavor_text_entries || []).find((e) => e.language?.name === "en")
+    const entry = (data.flavor_text_entries || []).find(e => e.language?.name === "en")
     const text = entry?.flavor_text ? entry.flavor_text.replace(/\f/g, " ") : ""
     speciesCache[id] = text
     return text
@@ -147,13 +151,13 @@ async function getEnglishFlavorText(id) {
   }
 }
 
-function searchPokemon() {
-  let searchValue = document.getElementById("searchInput").value.toLowerCase()
+async function searchPokemon() {
+  let searchValue = document.getElementById("searchInput").value.trim().toLowerCase()
   let content = document.getElementById("content")
   let loadBtn = document.getElementById("loadMoreBtn")
   let notFound = document.getElementById("not-found-message")
 
-  if (searchValue.length < 3) {
+  if (searchValue.length === 0) {
     findingPokemon()
     return
   }
@@ -167,14 +171,51 @@ function searchPokemon() {
 
   for (let i = 0; i < allPokemons.length; i++) {
     let p = allPokemons[i]
-    let match = sortByNumber ? String(p.id).startsWith(searchValue) : p.name.includes(searchValue)
+    let match = false
+
+    if (sortByNumber) {
+      match = String(p.id).startsWith(searchValue)
+    } else {
+      match = p.name.toLowerCase().includes(searchValue)
+    }
+
     if (match) {
       content.innerHTML += GetPokemonsTemplate(p)
       found = true
     }
   }
 
+  if (!found && sortByNumber && /^\d+$/.test(searchValue)) {
+    let id = Number(searchValue)
+    if (id >= 1 && id <= pokemon) {
+      try {
+        let response = await fetch(`${BASE_URL}/${id}`)
+        let p = await response.json()
+        content.innerHTML = GetPokemonsTemplate(p)
+        found = true
+      } catch {}
+    }
+  }
+
+  if (!found && !sortByNumber) {
+    try {
+      let response = await fetch(`${BASE_URL}/${searchValue}`)
+      let p = await response.json()
+      if (p && p.id >= 1 && p.id <= pokemon) {
+        content.innerHTML = GetPokemonsTemplate(p)
+        found = true
+      }
+    } catch {}
+  }
+
   if (!found) pokemonNotfound()
+}
+
+function searchPokemonDebounced() {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(function () {
+    searchPokemon()
+  }, 300)
 }
 
 function findingPokemon() {
@@ -182,13 +223,6 @@ function findingPokemon() {
   let notFound = document.getElementById("not-found-message")
   if (notFound) notFound.style.display = "none"
   renderPokemons()
-}
-
-let searchTimeout
-
-function searchPokemonDebounced() {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(searchPokemon, 300)
 }
 
 function pokemonNotfound() {
@@ -205,8 +239,9 @@ function clearSearch() {
 }
 
 async function loadMorePokemons() {
+  if (offset >= pokemon) return
   setLoading(true)
-  offset += 20
+  offset += limit
   await fetchDataJson()
   setLoading(false)
 }
