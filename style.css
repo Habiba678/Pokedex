@@ -678,13 +678,16 @@ dialog.dialog{
   gap: 12px;
 }
 
+
 @media (min-width: 900px) {
   .search-wrapper {
     flex-direction: row;
     align-items: center;
   }
 
-  .search-box { flex: 1; }
+  .search-box { 
+    flex: 1; 
+  }
 
   .sort-wrapper {
     margin-left: auto;
@@ -693,28 +696,43 @@ dialog.dialog{
 }
 
 @media (max-width: 600px) {
-  .container { padding: 16px 14px; }
-  .header-home .container{ padding: 10px 14px; }
+  .container { 
+    padding: 16px 14px; 
+  }
+
+  .header-home .container{ 
+    padding: 10px 14px; 
+  }
 }
 
 @media (min-width: 900px){
-  .list-wrapper{ grid-template-columns: repeat(5, var(--card-w)); }
+  .list-wrapper{ 
+    grid-template-columns: repeat(5, var(--card-w)); 
+  }
 }
 
 @media (min-width: 1200px){
-  .list-wrapper{ grid-template-columns: repeat(6, var(--card-w)); }
+  .list-wrapper{ 
+    grid-template-columns: repeat(6, var(--card-w)); 
+  }
 }
 
 @media (max-width: 900px){
-  .list-wrapper{ grid-template-columns: repeat(3, var(--card-w)); }
+  .list-wrapper{ 
+    grid-template-columns: repeat(3, var(--card-w)); 
+  }
 }
 
 @media (max-width: 600px){
-  .list-wrapper{ grid-template-columns: repeat(2, var(--card-w)); }
+  .list-wrapper{ 
+    grid-template-columns: repeat(2, var(--card-w)); 
+  }
 }
 
 @media (max-width: 360px){
-  .list-wrapper{ grid-template-columns: repeat(1, var(--card-w)); }
+  .list-wrapper{ 
+    grid-template-columns: repeat(1, var(--card-w)); 
+  }
 }
 
 @media (max-width: 1220px) {
@@ -745,33 +763,77 @@ dialog.dialog{
     padding: 12px 12px 40px;
   }
 
-  dialog.dialog[open] { padding: 12px; }
+  dialog.dialog[open] { 
+    padding: 12px; 
+  }
 
-  .pokeTop { padding: 10px 10px 12px; }
-  .pokeHeroImg { height: 110px; transform: translateY(8px); }
-  .pokeTypes { padding: 12px 10px; min-height: 50px; }
-  .tabBtn { height: 34px; font-size: 12px; }
+  .pokeTop { 
+    padding: 10px 10px 12px; 
+  }
+
+  .pokeHeroImg { 
+    height: 110px; 
+    transform: translateY(8px); 
+  }
+
+  .pokeTypes { 
+    padding: 12px 10px; 
+    min-height: 50px; 
+  }
+
+  .tabBtn { 
+    height: 34px; 
+    font-size: 12px; 
+  }
 }
 
 @media (max-width: 320px) {
   dialog.dialog {
-    width: calc(100vw - 16px);
+    width: calc(94vw - 16px);
     max-height: 80vh;
   }
 
-  dialog.dialog[open] { padding: 10px 8px; }
+  dialog.dialog[open] { 
+    padding: 10px 8px; 
+  }
 
-  .pokeHeader { padding: 8px 10px; }
-  .iconBtn { height: 32px; width: 32px; font-size: 16px; }
+  .pokeHeader { 
+    padding: 8px 10px; 
+  }
 
-  .pokeHero { grid-template-columns: 32px 1fr 32px; }
-  .navGhost { height: 32px; width: 32px; font-size: 20px; }
-  .pokeHeroImg { height: 100px;  }
+  .iconBtn { 
+    height: 32px; 
+    width: 32px; 
+    font-size: 16px; 
+  }
 
-  .pokeTypes { padding: 10px; min-height: 46px; }
-  .tabBtn { height: 32px; font-size: 11px; }
+  .pokeHero { 
+    grid-template-columns: 32px 1fr 32px; 
+  }
 
-  .pokeBody { padding: 10px 10px 40px; }
+  .navGhost { 
+    height: 32px; 
+    width: 32px; 
+    font-size: 20px; 
+  }
+
+  .pokeHeroImg { 
+    height: 100px;  
+  }
+
+  .pokeTypes { 
+    padding: 10px; 
+    min-height: 46px; 
+  }
+
+  .tabBtn { 
+    height: 32px; 
+    font-size: 61px; 
+  }
+
+  .pokeBody { 
+    padding: 10px 10px 40px; 
+  }
 }
 
 @media (min-width: 900px){
@@ -814,3 +876,226 @@ dialog.dialog{
     grid-column: 1;
   }
 }
+
+@media (max-width: 410px) {
+  .pokeTypes {
+    width: 100%;
+    padding: 0px 0px 5px;
+    min-height: 20px;
+}
+  }
+
+
+
+@media (max-width: 410px) {
+
+  dialog.dialog[open]{
+    align-items: flex-start;
+    padding-top: 16px;
+  }
+
+  
+  .pokeHeroImg{
+    height: 120px;
+    transform: translateY(6px);
+  }
+
+  .pokeTypes{
+    padding: 12px;        
+    min-height: 56px;     
+    gap: 10px;
+  }
+
+  .tabBtn{
+    height: 34px;
+    font-size: 12px;
+  }
+
+  .infoRow{
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+
+  .statKey{
+    font-size: 13px;
+  }
+
+  .statVal{
+    font-size: 14px;
+  }
+
+  .descText{
+    font-size: 12px;
+    min-height: 48px; /* bleibt stabil */
+  }
+}
+
+dialog.dialog{
+  margin: 0 !important;
+  border: none;
+  padding: 0;
+  background: transparent;
+  width: auto;         
+  max-height: none;
+}
+
+dialog.dialog::backdrop{
+  background: rgba(0,0,0,0.55);
+}
+
+dialog.dialog[open]{
+  position: fixed;
+  inset: 0;
+  display: block !important;
+  padding: 0 !important;
+}
+
+
+.pokeModal{
+  position: fixed;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(500px, calc(100vw - 28px));
+  max-height: calc(100dvh - 32px);
+
+  background: #063751;
+  border-radius: 12px !important;
+}
+
+
+
+@media (max-width: 420px){
+  .pokeModal{
+    top: 120px;
+    width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+
+  .pokeHeader{ 
+    padding: 9px 10px; 
+  }
+
+  .pokeTop{ 
+    padding: 10px 10px 12px; 
+  }
+
+  .pokeHeroImg{
+    height: 120px;
+    transform: translateY(6px);
+  }
+
+  .pokeTypes{
+    padding: 12px 10px;
+    min-height: 56px;
+    gap: 12px;
+  }
+
+  .tabBtn{ 
+    height: 34px; 
+    font-size: 16px; 
+  }
+
+  .pokeBody{ 
+    padding: 10px 10px 60px; 
+  }
+
+  .infoRow{ 
+    font-size: 16px; 
+    padding: 6px 10px; 
+  
+  }
+
+  .descText{ 
+    font-size: 16px; 
+    min-height: 48px; 
+  }
+}
+
+
+@media (max-width: 360px){
+  .pokeModal{
+    top: 120px;
+    width: calc(100vw - 20px);
+    max-height: calc(100dvh - 20px);
+  }
+
+  .pokeHeroImg{
+    height: 110px;
+    transform: translateY(4px);
+  }
+
+  .tabBtn{ height: 32px; font-size: 11px; }
+  .pokeBody{ padding: 10px 10px 50px; }
+}
+
+
+@media (max-width: 320px){
+  .pokeModal{
+    top: 120px;
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+
+  .pokeHeader{ 
+    padding: 8px 10px; 
+  }
+  .iconBtn{ 
+    height: 32px; 
+    width: 32px; 
+    font-size: 16px; 
+  }
+
+  .pokeHeroImg{ 
+    height: 100px; transform: 
+    translateY(3px); 
+  }
+  .pokeTypes{ 
+    padding: 10px; 
+  }
+}
+
+   @media (max-width: 820px) {
+
+    .pokeModal{
+      width: 420px;          
+      max-width: calc(100vw - 40px);
+      top: 120px;             
+    }
+  
+    .pokeHeroImg{
+      height: 120px;        
+      transform: translateY(6px);
+    }
+  
+    .pokeHeader{
+      padding: 9px 12px;
+    }
+  
+    .pokeTop{
+      padding: 10px 12px 12px;
+    }
+  
+    .pokeTypes{
+      padding: 12px;
+      gap: 12px;
+    }
+  
+    .tabBtn{
+      height: 34px;
+      font-size: 12px;
+    }
+  
+    .pokeBody{
+      padding: 10px 12px 60px;
+    }
+  
+    .infoRow{
+      font-size: 14px;
+      padding: 6px 10px;
+    }
+  
+    .descText{
+      font-size: 12px;
+    }
+  }
