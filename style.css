@@ -7,37 +7,27 @@
 :root {
   --page-bg: #ffffff;
   --page-text: #0f1720;
-
   --bg: #0f1720;
   --text: #e7eef7;
   --panel: rgba(15, 23, 32, 0.92);
   --panel-border: rgba(15, 23, 32, 0.12);
-
   --radius: 16px;
   --radius-sm: 12px;
-
   --header-bg: #d93025;
   --header-text: #ffffff;
-
   --search-bg: #ffffff;
   --search-border: rgba(0,0,0,0.12);
   --search-text: #111111;
   --search-placeholder: rgba(17,17,17,0.55);
-
   --card-w: 170px;
   --card-pad: 12px;
   --card-gap: 14px;
-
   --img-box-h: 150px;
   --poke-img-h: 110px;
-
   --name-size: 14px;
   --nr-size: 12px;
 }
 
-/* ===============================
-   BASE
-   =============================== */
 body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -54,9 +44,6 @@ body {
   padding: 20px 18px;
 }
 
-/* ===============================
-   HEADER + SEARCH
-   =============================== */
 .header-home{
   background: var(--header-bg);
   color: var(--header-text);
@@ -150,28 +137,6 @@ label.body-3-fonts,
   color: var(--header-text);
 }
 
-@media (min-width: 900px) {
-  .search-wrapper {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .search-box { flex: 1; }
-
-  .sort-wrapper {
-    margin-left: auto;
-    justify-content: flex-end;
-  }
-}
-
-@media (max-width: 600px) {
-  .container { padding: 16px 14px; }
-  .header-home .container{ padding: 10px 14px; }
-}
-
-/* ===============================
-   LIST / GRID
-   =============================== */
 .pokemon-list { padding: 16px 0 26px; }
 
 .list-wrapper{
@@ -181,29 +146,6 @@ label.body-3-fonts,
   grid-template-columns: repeat(2, var(--card-w));
 }
 
-@media (min-width: 900px){
-  .list-wrapper{ grid-template-columns: repeat(5, var(--card-w)); }
-}
-
-@media (min-width: 1200px){
-  .list-wrapper{ grid-template-columns: repeat(6, var(--card-w)); }
-}
-
-@media (max-width: 900px){
-  .list-wrapper{ grid-template-columns: repeat(3, var(--card-w)); }
-}
-
-@media (max-width: 600px){
-  .list-wrapper{ grid-template-columns: repeat(2, var(--card-w)); }
-}
-
-@media (max-width: 360px){
-  .list-wrapper{ grid-template-columns: repeat(1, var(--card-w)); }
-}
-
-/* ===============================
-   CARD
-   =============================== */
 .list-item{
   position: relative;
   width: var(--card-w);
@@ -307,9 +249,6 @@ label.body-3-fonts,
   width: 16px;
 }
 
-/* ===============================
-   MORE / EMPTY / LOADING
-   =============================== */
 .centerMoreButton {
   display: flex;
   justify-content: center;
@@ -386,9 +325,6 @@ body.is-loading #loadingScreen { display: flex; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ===============================
-   DIALOG / MODAL (FINAL: EIN BLOCK, EIN BORDER)
-   =============================== */
 dialog.dialog {
   border: none;
   padding: 0;
@@ -398,7 +334,6 @@ dialog.dialog {
   border-radius: var(--radius);
   background: transparent;
   position: relative;
-  
 }
 
 dialog.dialog[open] {
@@ -419,17 +354,13 @@ dialog.dialog::backdrop {
   background: rgba(0, 0, 0, 0.55);
 }
 
-/* IMPORTANT: Wrapper darf NICHT wie eine zweite Box wirken */
 #renderPokemonsDialog {
   width: 100%;
   height: 100%;
   background: transparent;
   border: none;
-  
-  
 }
 
-/* NUR .pokeModal ist der echte Dialog */
 .pokeModal {
   width: 100%;
   max-height: 88vh;
@@ -438,7 +369,6 @@ dialog.dialog::backdrop {
   box-shadow: none;
   background: #063751;
   border-radius: 12px !important;
-  
 }
 
 .pokeHeader {
@@ -548,7 +478,6 @@ dialog.dialog::backdrop {
   color: #fff;
 }
 
-/* unten Platz, aber nicht riesig */
 .pokeBody{
   flex: 1 1 auto;
   padding: 12px 12px 100px;
@@ -573,7 +502,6 @@ dialog.dialog::backdrop {
 
 .infoGrid { display: grid; gap: 10px; }
 
-/* Text/Zahlen max 16 */
 .infoRow {
   display: flex;
   justify-content: space-between;
@@ -677,76 +605,6 @@ dialog.dialog::backdrop {
   filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.35));
 }
 
-
-
-@media (max-width: 1220px) {
-  .pokeBody{
-    padding: 12px 12px 60px;
-    
-  }
-  
-  }
-
-
-@media (max-width: 989px) {
-  .pokeBody{
-    padding: 12px 12px 60px;
-   
-  }
-  
-  }
-
-@media (max-width: 768px) {
-.pokeBody{
-  padding: 12px 12px 40px;
- 
-}
-
-}
-@media (max-width: 340px) {
-  dialog.dialog {
-    width: calc(100vw - 24px);
-    max-height: 84vh;
-  }
-
-  .pokeBody{
-    padding: 12px 12px 40px;
-   
-  }
-
-  dialog.dialog[open] { padding: 12px; }
-
-  .pokeTop { padding: 10px 10px 12px; }
-  .pokeHeroImg { height: 110px; transform: translateY(8px); }
-  .pokeTypes { padding: 12px 10px; min-height: 50px; }
-  .tabBtn { height: 34px; font-size: 12px; }
-  
-}
-
-@media (max-width: 320px) {
-  dialog.dialog {
-    width: calc(100vw - 16px);
-    max-height: 80vh;
-  }
-
-  dialog.dialog[open] { padding: 10px 8px; }
-
-  .pokeHeader { padding: 8px 10px; }
-  .iconBtn { height: 32px; width: 32px; font-size: 16px; }
-
-  .pokeHero { grid-template-columns: 32px 1fr 32px; }
-  .navGhost { height: 32px; width: 32px; font-size: 20px; }
-  .pokeHeroImg { height: 100px;  }
-
-  .pokeTypes { padding: 10px; min-height: 46px; }
-  .tabBtn { height: 32px; font-size: 11px; }
-
-  .pokeBody { padding: 10px 10px 40px; }
-}
-
-
-
-
 dialog.dialog[open]{
   display:flex;
   justify-content:center;
@@ -761,13 +619,6 @@ dialog.dialog{
 .descText{
   min-height:48px;
 }
-
-
-
-
-
-
-
 
 .sort-area{
   margin-left: auto;
@@ -814,11 +665,113 @@ dialog.dialog{
 }
 
 .sort-toggle:checked ~ .sort-panel{
-  display: block;
+  display: flex;
 }
 
 .sort-panel .filter-section{
   gap: 10px;
+}
+
+.search-wrapper{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (min-width: 900px) {
+  .search-wrapper {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .search-box { flex: 1; }
+
+  .sort-wrapper {
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 600px) {
+  .container { padding: 16px 14px; }
+  .header-home .container{ padding: 10px 14px; }
+}
+
+@media (min-width: 900px){
+  .list-wrapper{ grid-template-columns: repeat(5, var(--card-w)); }
+}
+
+@media (min-width: 1200px){
+  .list-wrapper{ grid-template-columns: repeat(6, var(--card-w)); }
+}
+
+@media (max-width: 900px){
+  .list-wrapper{ grid-template-columns: repeat(3, var(--card-w)); }
+}
+
+@media (max-width: 600px){
+  .list-wrapper{ grid-template-columns: repeat(2, var(--card-w)); }
+}
+
+@media (max-width: 360px){
+  .list-wrapper{ grid-template-columns: repeat(1, var(--card-w)); }
+}
+
+@media (max-width: 1220px) {
+  .pokeBody{
+    padding: 12px 12px 60px;
+  }
+}
+
+@media (max-width: 989px) {
+  .pokeBody{
+    padding: 12px 12px 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pokeBody{
+    padding: 12px 12px 40px;
+  }
+}
+
+@media (max-width: 340px) {
+  dialog.dialog {
+    width: calc(100vw - 24px);
+    max-height: 84vh;
+  }
+
+  .pokeBody{
+    padding: 12px 12px 40px;
+  }
+
+  dialog.dialog[open] { padding: 12px; }
+
+  .pokeTop { padding: 10px 10px 12px; }
+  .pokeHeroImg { height: 110px; transform: translateY(8px); }
+  .pokeTypes { padding: 12px 10px; min-height: 50px; }
+  .tabBtn { height: 34px; font-size: 12px; }
+}
+
+@media (max-width: 320px) {
+  dialog.dialog {
+    width: calc(100vw - 16px);
+    max-height: 80vh;
+  }
+
+  dialog.dialog[open] { padding: 10px 8px; }
+
+  .pokeHeader { padding: 8px 10px; }
+  .iconBtn { height: 32px; width: 32px; font-size: 16px; }
+
+  .pokeHero { grid-template-columns: 32px 1fr 32px; }
+  .navGhost { height: 32px; width: 32px; font-size: 20px; }
+  .pokeHeroImg { height: 100px;  }
+
+  .pokeTypes { padding: 10px; min-height: 46px; }
+  .tabBtn { height: 32px; font-size: 11px; }
+
+  .pokeBody { padding: 10px 10px 40px; }
 }
 
 @media (min-width: 900px){
@@ -828,10 +781,25 @@ dialog.dialog{
 }
 
 
-.search-wrapper{
-  display: flex;
-  align-items: center;
-  gap: 12px;
+
+@media (max-width: 900px){
+  .search-wrapper{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .search-box{
+    grid-column: 1;
+  }
+}
+
+
+@media (min-width: 900px){
+  .sort-panel{
+    top: 34px;
+  }
 }
 
 @media (max-width: 900px){
