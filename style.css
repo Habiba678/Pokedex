@@ -926,7 +926,7 @@ dialog.dialog{
 
   .descText{
     font-size: 12px;
-    min-height: 48px; /* bleibt stabil */
+    min-height: 48px; 
   }
 }
 
@@ -1099,3 +1099,37 @@ dialog.dialog[open]{
       font-size: 12px;
     }
   }
+
+@media (max-width: 720px){
+  :root{
+    --card-w: 180px;   
+  }
+
+  .container{
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+
+@media (max-width: 420px){
+  :root{
+    --card-w: 165px;   
+  }
+
+  .container{
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+@media (max-width: 360px){
+  :root{
+    --card-w: 175px;
+  }
+
+  .container{
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
