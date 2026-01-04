@@ -8,6 +8,7 @@ const pokemon = 151
 let pokemonCache = {}
 let speciesCache = {}
 let searchTimeout
+let fullPokemonList = []
 
 const typeColors = {
   normal: "#A8A77A",
@@ -34,9 +35,20 @@ const typeColors = {
 async function init() {
   offset = 0
   setLoading(true)
+  await fetchFullPokemonList()
   await fetchDataJson()
   setLoading(false)
   document.getElementById("loadMoreBtn").onclick = loadMorePokemons
+}
+
+async function fetchFullPokemonList() {
+  try {
+    const response = await fetch(`${BASE_URL}?limit=${pokemon}&offset=0`)
+    const data = await response.json()
+    fullPokemonList = data.results || []
+  } catch {
+    fullPokemonList = []
+  }
 }
 
 async function fetchDataJson() {
@@ -73,10 +85,11 @@ async function getPokemon(entry) {
 function renderPokemons() {
   let content = document.getElementById("content")
   content.classList.remove("hidden")
-  content.innerHTML = ""
+  let html = ""
   for (let i = 0; i < allPokemons.length; i++) {
-    content.innerHTML += GetPokemonsTemplate(allPokemons[i])
+    html += GetPokemonsTemplate(allPokemons[i])
   }
+  content.innerHTML = html
 }
 
 async function OpenPokemon(index) {
@@ -151,64 +164,81 @@ async function getEnglishFlavorText(id) {
   }
 }
 
-async function searchPokemon() {
-  let searchValue = document.getElementById("searchInput").value.trim().toLowerCase()
-  let content = document.getElementById("content")
-  let loadBtn = document.getElementById("loadMoreBtn")
-  let notFound = document.getElementById("not-found-message")
+function getSearchValue() {
+  return document.getElementById("searchInput").value.trim().toLowerCase()
+}
 
-  if (searchValue.length === 0) {
-    findingPokemon()
-    return
+function getSearchElements() {
+  return {
+    content: document.getElementById("content"),
+    loadBtn: document.getElementById("loadMoreBtn"),
+    notFound: document.getElementById("not-found-message")
   }
+}
 
+function prepareSearchUI(content, loadBtn, notFound) {
+  content.classList.remove("hidden")
   content.innerHTML = ""
   loadBtn.style.display = "none"
   if (notFound) notFound.style.display = "none"
+}
 
-  let found = false
-  let sortByNumber = document.getElementById("number")?.checked
-
-  for (let i = 0; i < allPokemons.length; i++) {
-    let p = allPokemons[i]
-    let match = false
-
-    if (sortByNumber) {
-      match = String(p.id).startsWith(searchValue)
-    } else {
-      match = p.name.toLowerCase().includes(searchValue)
-    }
-
-    if (match) {
-      content.innerHTML += GetPokemonsTemplate(p)
-      found = true
-    }
+function renderSearchResults(content, pokemons) {
+  let html = ""
+  for (let i = 0; i < pokemons.length; i++) {
+    html += GetPokemonsTemplate(pokemons[i])
   }
+  content.innerHTML = html
+}
 
-  if (!found && sortByNumber && /^\d+$/.test(searchValue)) {
-    let id = Number(searchValue)
-    if (id >= 1 && id <= pokemon) {
-      try {
-        let response = await fetch(`${BASE_URL}/${id}`)
-        let p = await response.json()
-        content.innerHTML = GetPokemonsTemplate(p)
-        found = true
-      } catch {}
-    }
+function findEntriesByName(query) {
+  if (!fullPokemonList.length) return []
+  return fullPokemonList.filter(e => e.name.includes(query))
+}
+
+function findIdsByNumberPrefix(prefix) {
+  let ids = []
+  for (let i = 1; i <= pokemon; i++) {
+    if (String(i).startsWith(prefix)) ids.push(i)
   }
+  return ids
+}
 
-  if (!found && !sortByNumber) {
+async function fetchPokemonsFromEntries(entries, maxCount) {
+  let result = []
+  let count = Math.min(entries.length, maxCount)
+  for (let i = 0; i < count; i++) {
+    let p = await getPokemon(entries[i])
+    result.push(p)
+  }
+  return result
+}
+async function fetchPokemonsFromIds(ids, maxCount) {
+  let result = []
+  let count = Math.min(ids.length, maxCount)
+  for (let i = 0; i < count; i++) {
+    let id = ids[i]
     try {
-      let response = await fetch(`${BASE_URL}/${searchValue}`)
+      let response = await fetch(`${BASE_URL}/${id}`)
+      if (!response.ok) continue
       let p = await response.json()
-      if (p && p.id >= 1 && p.id <= pokemon) {
-        content.innerHTML = GetPokemonsTemplate(p)
-        found = true
-      }
+      if (p && p.id >= 1 && p.id <= pokemon) result.push(p)
     } catch {}
   }
+  return result
+}
 
-  if (!found) pokemonNotfound()
+async function searchPokemon() {
+  let searchValue = getSearchValue()
+  if (searchValue.length === 0) { findingPokemon(); return }
+  let { content, loadBtn, notFound } = getSearchElements()
+  prepareSearchUI(content, loadBtn, notFound)
+  let isNumber = /^\d+$/.test(searchValue)
+  let results = isNumber
+    ? await fetchPokemonsFromIds(findIdsByNumberPrefix(searchValue), 40)
+    : await fetchPokemonsFromEntries(findEntriesByName(searchValue), 40)
+  if (results.length) renderSearchResults(content, results)
+  else pokemonNotfound()
 }
 
 function searchPokemonDebounced() {
