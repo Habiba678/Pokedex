@@ -213,6 +213,7 @@ async function fetchPokemonsFromEntries(entries, maxCount) {
   }
   return result
 }
+
 async function fetchPokemonsFromIds(ids, maxCount) {
   let result = []
   let count = Math.min(ids.length, maxCount)
