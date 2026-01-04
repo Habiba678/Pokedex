@@ -189,6 +189,7 @@ async function searchPokemon() {
 
   let mode = getSearchMode(), digits = /^\d+$/.test(value)
   if ((mode === "number" && !digits) || (mode === "name" && digits)) return pokemonNotfound()
+    if (mode === "name" && value.length < 2) return pokemonNotfound() 
 
   let { content, loadBtn, notFound } = getSearchElements()
   prepareSearchUI(content, loadBtn, notFound)
