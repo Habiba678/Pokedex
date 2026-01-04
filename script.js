@@ -8,7 +8,6 @@ const pokemon = 151
 let pokemonCache = {}
 let speciesCache = {}
 let searchTimeout
-let fullPokemonList = []
 
 const typeColors = {
   normal: "#A8A77A",
@@ -35,20 +34,9 @@ const typeColors = {
 async function init() {
   offset = 0
   setLoading(true)
-  await fetchFullPokemonList()
   await fetchDataJson()
   setLoading(false)
   document.getElementById("loadMoreBtn").onclick = loadMorePokemons
-}
-
-async function fetchFullPokemonList() {
-  try {
-    const response = await fetch(`${BASE_URL}?limit=${pokemon}&offset=0`)
-    const data = await response.json()
-    fullPokemonList = data.results || []
-  } catch {
-    fullPokemonList = []
-  }
 }
 
 async function fetchDataJson() {
@@ -56,10 +44,7 @@ async function fetchDataJson() {
   setLoading(true)
   const list = await fetchPokemonList(offset)
   let newPokemons = []
-  for (let entry of list) {
-    const p = await getPokemon(entry)
-    newPokemons.push(p)
-  }
+  for (let entry of list) newPokemons.push(await getPokemon(entry))
   allPokemons.push(...newPokemons)
   renderPokemons()
   setLoading(false)
@@ -86,9 +71,7 @@ function renderPokemons() {
   let content = document.getElementById("content")
   content.classList.remove("hidden")
   let html = ""
-  for (let i = 0; i < allPokemons.length; i++) {
-    html += GetPokemonsTemplate(allPokemons[i])
-  }
+  for (let i = 0; i < allPokemons.length; i++) html += GetPokemonsTemplate(allPokemons[i])
   content.innerHTML = html
 }
 
@@ -123,9 +106,7 @@ function showStats(p) {
 
 function renderAllStats(p) {
   let html = ""
-  for (let i = 0; i < p.stats.length; i++) {
-    html += getStatsSection(p.stats[i].stat.name, p.stats[i].base_stat)
-  }
+  for (let i = 0; i < p.stats.length; i++) html += getStatsSection(p.stats[i].stat.name, p.stats[i].base_stat)
   return html
 }
 
@@ -153,19 +134,20 @@ async function getEnglishFlavorText(id) {
   if (speciesCache[id] !== undefined) return speciesCache[id]
   try {
     const response = await fetch(`${SPECIES_URL}/${id}`)
+    if (!response.ok) { speciesCache[id] = ""; return "" }
     const data = await response.json()
     const entry = (data.flavor_text_entries || []).find(e => e.language?.name === "en")
     const text = entry?.flavor_text ? entry.flavor_text.replace(/\f/g, " ") : ""
     speciesCache[id] = text
     return text
-  } catch {
+  } catch (err) {
     speciesCache[id] = ""
     return ""
   }
 }
 
-function getSearchValue() {
-  return document.getElementById("searchInput").value.trim().toLowerCase()
+function getSearchMode() {
+  return document.getElementById("number")?.checked ? "number" : "name"
 }
 
 function getSearchElements() {
@@ -183,63 +165,40 @@ function prepareSearchUI(content, loadBtn, notFound) {
   if (notFound) notFound.style.display = "none"
 }
 
-function renderSearchResults(content, pokemons) {
+function renderSearchResults(content, list) {
   let html = ""
-  for (let i = 0; i < pokemons.length; i++) {
-    html += GetPokemonsTemplate(pokemons[i])
-  }
+  for (let i = 0; i < list.length; i++) html += GetPokemonsTemplate(list[i])
   content.innerHTML = html
 }
 
-function findEntriesByName(query) {
-  if (!fullPokemonList.length) return []
-  return fullPokemonList.filter(e => e.name.includes(query))
-}
-
-function findIdsByNumberPrefix(prefix) {
-  let ids = []
-  for (let i = 1; i <= pokemon; i++) {
-    if (String(i).startsWith(prefix)) ids.push(i)
+async function fetchPokemonSafe(value) {
+  try {
+    let response = await fetch(`${BASE_URL}/${value}`)
+    if (!response.ok) return null
+    let p = await response.json()
+    if (!p || p.id < 1 || p.id > pokemon) return null
+    return p
+  } catch (err) {
+    return null
   }
-  return ids
-}
-
-async function fetchPokemonsFromEntries(entries, maxCount) {
-  let result = []
-  let count = Math.min(entries.length, maxCount)
-  for (let i = 0; i < count; i++) {
-    let p = await getPokemon(entries[i])
-    result.push(p)
-  }
-  return result
-}
-
-async function fetchPokemonsFromIds(ids, maxCount) {
-  let result = []
-  let count = Math.min(ids.length, maxCount)
-  for (let i = 0; i < count; i++) {
-    let id = ids[i]
-    try {
-      let response = await fetch(`${BASE_URL}/${id}`)
-      if (!response.ok) continue
-      let p = await response.json()
-      if (p && p.id >= 1 && p.id <= pokemon) result.push(p)
-    } catch {}
-  }
-  return result
 }
 
 async function searchPokemon() {
-  let searchValue = getSearchValue()
-  if (searchValue.length === 0) { findingPokemon(); return }
+  let value = document.getElementById("searchInput").value.trim().toLowerCase()
+  if (!value) return findingPokemon()
+
+  let mode = getSearchMode(), digits = /^\d+$/.test(value)
+  if ((mode === "number" && !digits) || (mode === "name" && digits)) return pokemonNotfound()
+
   let { content, loadBtn, notFound } = getSearchElements()
   prepareSearchUI(content, loadBtn, notFound)
-  let isNumber = /^\d+$/.test(searchValue)
-  let results = isNumber
-    ? await fetchPokemonsFromIds(findIdsByNumberPrefix(searchValue), 40)
-    : await fetchPokemonsFromEntries(findEntriesByName(searchValue), 40)
-  if (results.length) renderSearchResults(content, results)
-  else pokemonNotfound()
+
+  let list = allPokemons.filter(p => mode === "number" ? p.id === Number(value) : p.name.toLowerCase().includes(value))
+  if (list.length) return renderSearchResults(content, list)
+
+  let p = await fetchPokemonSafe(value)
+  if (p && (mode !== "number" || p.id === Number(value))) return renderSearchResults(content, [p])
+  pokemonNotfound()
 }
 
 function searchPokemonDebounced() {
