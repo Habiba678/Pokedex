@@ -51,6 +51,7 @@ async function fetchPokemonIndex() {
       pokemonUrlByName[name] = data.results[i].url
     }
   } catch (err) {
+    console.log(err)
     pokemonUrlByName = {}
   }
 }
@@ -205,6 +206,7 @@ async function fetchPokemonSafe(value) {
     return false;
   }
 }
+
 async function searchPokemon() {
   let value = document.getElementById("searchInput").value.trim().toLowerCase()
   if (!value) return findingPokemon()
