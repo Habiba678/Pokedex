@@ -1141,3 +1141,7 @@ dialog.dialog[open]{
       transform: translateX(-50%);
     }
   }
+
+  #searchInput {
+    color: #000;
+  }

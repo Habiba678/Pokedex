@@ -8,6 +8,7 @@ const pokemon = 151
 let pokemonCache = {}
 let speciesCache = {}
 let searchTimeout
+let pokemonUrlByName = {}
 
 const typeColors = {
   normal: "#A8A77A",
@@ -34,9 +35,24 @@ const typeColors = {
 async function init() {
   offset = 0
   setLoading(true)
+  await fetchPokemonIndex()
   await fetchDataJson()
   setLoading(false)
   document.getElementById("loadMoreBtn").onclick = loadMorePokemons
+}
+
+async function fetchPokemonIndex() {
+  try {
+    const response = await fetch(`${BASE_URL}?limit=${pokemon}&offset=0`)
+    const data = await response.json()
+    pokemonUrlByName = {}
+    for (let i = 0; i < (data.results || []).length; i++) {
+      let name = data.results[i].name.toLowerCase()
+      pokemonUrlByName[name] = data.results[i].url
+    }
+  } catch (err) {
+    pokemonUrlByName = {}
+  }
 }
 
 async function fetchDataJson() {
@@ -141,7 +157,7 @@ async function getEnglishFlavorText(id) {
     speciesCache[id] = text
     return text
   } catch (err) {
-    speciesCache[id] = ""
+     console.log(speciesCache[id]) = ""
     return ""
   }
 }
@@ -173,32 +189,33 @@ function renderSearchResults(content, list) {
 
 async function fetchPokemonSafe(value) {
   try {
-    let response = await fetch(`${BASE_URL}/${value}`)
+    if (/^\d+$/.test(value)) {
+      let n = Number(value)
+      if (n < 1 || n > pokemon) return null
+    }
+    let url = pokemonUrlByName[value] || `${BASE_URL}/${value}`
+    let response = await fetch(url)
     if (!response.ok) return null
     let p = await response.json()
     if (!p || p.id < 1 || p.id > pokemon) return null
     return p
-  } catch (err) {
-    return null
+  
+  } catch (error) {
+    console.error("Data could not be loaded", error);
+    return false;
   }
 }
-
 async function searchPokemon() {
   let value = document.getElementById("searchInput").value.trim().toLowerCase()
   if (!value) return findingPokemon()
-
   let mode = getSearchMode(), digits = /^\d+$/.test(value)
   if ((mode === "number" && !digits) || (mode === "name" && digits)) return pokemonNotfound()
-    if (mode === "name" && value.length < 2) return pokemonNotfound() 
-
-  let { content, loadBtn, notFound } = getSearchElements()
-  prepareSearchUI(content, loadBtn, notFound)
-
-  let list = allPokemons.filter(p => mode === "number" ? p.id === Number(value) : p.name.toLowerCase().includes(value))
+  if (mode === "number" && (value < 1 || value > pokemon)) return pokemonNotfound()
+  if (mode === "name" && value.length < 3) return pokemonNotfound()
+  let { content, loadBtn, notFound } = getSearchElements(); prepareSearchUI(content, loadBtn, notFound)
+  let list = allPokemons.filter(p => mode === "number" ? p.id === +value : p.name.includes(value))
   if (list.length) return renderSearchResults(content, list)
-
-  let p = await fetchPokemonSafe(value)
-  if (p && (mode !== "number" || p.id === Number(value))) return renderSearchResults(content, [p])
+  if (mode === "name" && pokemonUrlByName[value]) { let p = await fetchPokemonSafe(value); if (p) return renderSearchResults(content, [p]) }
   pokemonNotfound()
 }
 
