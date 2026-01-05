@@ -252,6 +252,11 @@ async function loadMorePokemons() {
   if (offset >= pokemon) return
   setLoading(true)
   offset += limit
-  await fetchDataJson()
-  setLoading(false)
+  try {
+    await fetchDataJson()
+  } catch (err) {
+    console.log(err)
+  } finally {
+    setLoading(false)
+  }
 }
